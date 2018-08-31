@@ -1,0 +1,80 @@
+动静分离：
+nginx    php
+nginx实现：
+如果用户访问的是静态页面，则自己直接找到页面，直接返回。
+如果用户访问的动态PHP，则转发给9000端口，解释后，再返回
+locationp匹配用户的地址栏
+
+nginx[通过2个location实现动静分离]
+nginx[返回静态页面，转发动态页面给9000]
+
+如果动态PHP访问失败，可查看日志：
+tailf /var/log/php-fpm/www-erreo.log
+
+nginx端口：80 。
+mariadb端口：3306。
+php-fpm端口：9000。
+
+rewrite 旧地址  新地址  [选项]
+rewrite /a.html  /b.html; 
+rewrite /a.html  /cc/c.html;
+rewrite ^/       /index.html;
+rewrite ^/       http://www.baidu.com;
+rewrite ^/(.*)   http://www.baidu.com/$1;
+
+location /a.html {
+	rewrite /a.html  /b.html break;
+}
+location /b.html {
+	rewrite /b.html  /c.html break;
+}
+
+
+
+检测用户是否用火狐浏览器，如果是，转至火狐浏览器专用页面。
+if ($http_user_agent ~* firefox) {
+	rewrite /(.*)  /firefox/$1;
+}
+
+
+location /status {
+	stub_status on;
+      allow ip(可以配置本机的ip，只允许自己查看);
+      deny all(拒绝所有)； 
+}
+
+
+远程并且for循环yum装包：
+for i in $1 $2 $3 回车
+>do回车
+>ssh 192.168.2.$1"yum -y install gcc pcre-devel openssl-devel"
+> done
+输密码
+
+
+快速撤销多行#注释：
+Ctrl+v  下键   x
+快速加多行#注释：
+Ctrl+v  下键  shift+i 输入#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

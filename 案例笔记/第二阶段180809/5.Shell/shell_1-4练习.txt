@@ -1,0 +1,188 @@
+1.什么是默认 Shell,如何修改她?
+默认指的是/bin/bash  
+/etc/passwd  usermod  useradd
+
+2.简单列举 6 个常见 Linux 系统预设变量,并说明其作用?
+$0：脚本名称
+$USER：用户名
+$HOSTNAME：主机名
+$?：上一个指令的状态返回值
+$#：参数的综合个数
+$*：所有参数
+$1：第一个参数
+$2：第二个参数
+$3：第三个参数
+
+
+env：查看系统变量
+set：查看所有变量
+
+
+
+3.如何将标准输出与错误输出重定向到一个位置,如何将标准输出重定向
+到/dev/null?
+
+标准输出：>    错误输出重定：2>
+> /dev/null
+
+4.使用 3 个 read 读取用户输入的 3 个整数,脚本按照大小排序依次输出 3 个数字?
+#!/bin/bash
+if [ $1 -gt $2 ] && [ $2 -gt $3 ];then
+ echo $1  $2  $3
+elif [ $1 -gt $3 ] && [ $3 -gt $2 ];then
+ echo $1  $3  $2
+elif [ $2 -gt $1 ] && [ $1 -gt $3 ];then
+ echo $2  $1  $3
+elif [ $2 -gt $3 ] && [ $3 -gt $1 ];then
+ echo $2  $3  $1
+elif [ $3 -gt $2 ] && [ $2 -gt $1 ];then
+ echo $3  $2  $1
+elif [ $3 -gt $1 ] && [ $1 -gt $2 ];then
+ echo $3  $1  $2
+fi
+
+
+6.编写脚本,实现人机<石头,剪刀,布>游戏?
+#!/bin/bash
+echo ""0"代表拳头，"1"代表剪刀，"2"代表布；"
+read -p "请出拳：" b
+b=${b:-123}
+if [ $b -lt 3 ];then
+        if [ $b -eq 0 ];then
+         echo "您出：拳头"
+        elif [ $b -eq 1 ];then
+         echo "您出：剪刀"
+        else
+         echo "您出：布"
+        fi
+        g(){
+          a=$[RANDOM%3]
+          if [ $a -eq 0 ];then
+            echo "拳头"
+            elif [ $a -eq 1 ];then
+            echo "剪刀"
+          else
+            echo "布"
+          fi
+        }
+        echo -n   "电脑出:" &&  g
+        if [ $b ==  0 ] && [ $a == 2 ];then
+          echo "你输了" 
+        elif [ $b == 0 ] && [ $a == 1 ];then
+          echo "你赢了" 
+        elif [ $b == 0 ] && [ $a == 0 ];then
+          echo "平手" 
+        elif [ $b == 1 ] && [ $a == 2 ];then
+          echo "你赢了"
+        elif [ $b == 1 ] && [ $a == 0 ];then
+          echo "你输了"
+        elif [ $b == 1 ] && [ $a == 1 ];then
+          echo "平手"
+        elif [ $b == 2 ] && [ $a == 0 ];then
+          echo "你赢了" 
+        elif [ $b ==  2 ] && [ $a == 1 ];then
+          echo "你输了"
+        else
+          echo "平手"
+        fi
+elif [ $b == 123 ];then
+ echo "您没出拳，游戏结束！"
+else
+ echo "无效选项，游戏结束！"
+ exit 1
+fi
+
+
+7.编写脚本测试 192.168.4.0/24 整个网段中哪些主机处于开机状态,哪些主机处于关机状态?
+##!/bin/bash
+myping(){
+    ping -c2 -i0.1 -W1 172.25.0.$i  &> /dev/null
+  if [ $? -eq 0 ];then
+    echo -e   "\033[42;37m172.25.0.$i 处于开机状态\033[0m"
+  else
+    echo -e   "\033[41;37m172.25.0.$i 处于关机状态\033[0m"
+  fi
+};
+ for i in {1..254}
+  do
+  myping $i &
+  done
+ sleep 0.1
+ wait
+
+
+8.编写脚本打印 9*9 乘法表?
+#!/bin/bash
+for i in {1..9}
+do
+  for j in `seq $i`
+  do
+   echo -n "$i*$j=$[i*j]  "
+  done
+  echo 
+done
+
+
+9.判断当前主机的 CPU 生产商,其信息在/proc/cpuinfo 文件中 vendor id 一行中。如果其生产商为
+GenuineIntel,就显示其为 Intel 公司;否则,就显示其为 AMD 公司?
+#!/bin/bash
+grep GenuineIntel  /proc/cpuinfoe  &> /dev/null
+ if [ $? -eq 0 ];then
+ echo  "Intel 公司"
+else
+ echo "AMD 公司"
+fi
+
+
+10. 使用死循环实时显示 eth0 网卡发送的数据包流量?
+#!/bin/bash
+while :
+ do
+  clear
+  echo -e   "\033[33;34meth0网卡流量信息显示:\033[0m"
+  ifconfig eth0 | grep "RX packets"
+  ifconfig eth0 | grep "TX packets"
+  sleep 0.5
+ done
+
+
+11. 使用 user.txt 文件中的人员名单,在计算机中自动创建对应的账户并配置密码?
+#!/bin/bash
+if [ $# -eq 0 ];then
+  echo "没有输入文件"
+  exit 1
+fi
+if [ ! -f $1 ];then
+ echo "$1 文件不存在"
+ exit 2
+fi
+  for name in $(cat $1)
+  do
+   useradd $name  &> /dev/null
+   echo "用户$name 创建成功"
+   echo '123456' | passwd --stdin $name  &> /dev/null
+   echo "用户$name 密码为：123456"
+  done
+
+
+12. 编写批量修改扩展名脚本,如批量将 txt 文件修改为 doc 文件?
+#!/bin/bash
+for i in *.$1
+do
+  mv $i  ${i%$1}$2
+done
+
+
+
+13. 使用 expect 工具自动交互密码远程其他主机安装 httpd 软件?
+yum -y install expect
+
+#!/bin/bash
+expect << EOF
+spawn ssh -o StrictHostKeyChecking=no 172.25.0.10
+expect "password"  {send "redhat\n"}
+expect "#"  {send "yum -y install httpd\n"}
+expect "~"  {send "exit\r"}
+EOF
+
+           

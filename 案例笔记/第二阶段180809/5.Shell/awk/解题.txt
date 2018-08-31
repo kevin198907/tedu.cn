@@ -1,0 +1,36 @@
+题目 1:打印整个文件
+awk '{print}' /root/grade.txt 
+
+题目 2:打印第一和第四个列
+awk  '{print $1,$4}' /root/grade.txt  |column -t
+
+题目 3:打印表头 Name  Belt,然后显示文档第一列和第四列
+awk 'BEGIN{print "Name  Belt"}{print $1,$4}'  grade.txt | column -t
+
+题目 4:打印第四列包含 Brown 的行
+awk '$4~/Brown/' grade.txt
+
+题目 5:打印第三列包含 48 的行
+awk '$3~/48/'  grade.txt
+
+题目 6:显示第三列是 48 的行
+awk '$3==48'  grade.txt
+
+题目 7:显示不包含 Brown 的行
+awk '!/Brown/' grade.txt
+
+题目 8:打印第四列不是 Brown-2 的行
+awk '$4!="Brown-2"' grade.txt
+
+题目 9:当第六列大于第七列是,显示:$6 大于 $7
+ awk  '{if ($6>$7){print $6"大于" $7}}' grade.txt
+
+题目 10:当第一列的第三个字符是 a 时,显示该行
+ awk '$1~/^..a/' grade.txt
+
+题目 11:显示包含 Yellow 或 Brown 的行
+awk '/(Yellow|Brown)/'  grade.txt
+
+题目 12:显示文档第一列、第六列、第七列,如果第一列是 M.Tansley,则
+先将其第六列的值减 1 后再输出。
+awk  '{if($1=="M.Tansley"){$6--}print $1,$6,$7}' grade.txt | column -t

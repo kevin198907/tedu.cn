@@ -1,0 +1,118 @@
+
+ 打印 红底黄字： echo -e "\033[41;33m#\033[0m"
+把姓名那一列做为数组
+[root@server0 ~]# name=$(awk -F. '{print $2}' record.txt)
+[root@server0 ~]# echo ${name[*]}
+
+#!/bin/bash
+for i in {1..42};do
+        echo -ne "\033[41;33m#\033[0m"
+done
+echo
+echo -ne "\033[41;33m#      1:search a record                 #\033[0m"
+echo
+echo -ne "\033[41;33m#      2:add  a record                   #\033[0m"
+echo
+echo -ne "\033[41;33m#      3:delete a record                 #\033[0m"
+echo
+echo -ne "\033[41;33m#      4:display all record              #\033[0m"
+echo
+echo -ne "\033[41;33m#      5:edit record with vi             #\033[0m"
+echo
+echo -ne "\033[41;33m#      H:help screen                     #\033[0m"
+echo
+echo -ne "\033[41;33m#      Q:exit pragma                     #\033[0m"
+echo
+for i in {1..42};do
+        echo -ne "\033[41;33m#\033[0m"
+done
+echo -e "\033[0m \033[0m"
+echo
+read -p "$(echo -ne "\033[40;32mplease enter your choice [1 2 3 4 5 H Q]:  \033[0m")" i
+
+clear
+case $i in
+1)
+clear
+while :
+do 
+        read -p "please enter name >>>" name
+     if [ -z $name ]; then
+	echo "didn't enter"
+	sleep 2
+	clear && continue
+    fi
+   if [ ! -f record ];then
+        echo "No record"
+        sleep 3 && exit
+   fi
+grep -i "$name" record &>/dev/null
+case $? in
+  0) grep -i "$name" record
+	sleep 3
+	clear
+	sh $0;;
+  *) echo "name not in record"
+	sleep 1
+	clear && continue;;
+  esac
+  done;;
+2)
+read -p "$(echo -e "\033[40;32menter name and cxore of a recoed:\033[0m")" j
+  if [ -z $j ]; then
+        echo "you didn't enter any value"
+        sleep 1 && clear && continue
+  else
+        echo "$j" >> /root/record
+        echo "added "$j" in record"
+        sleep 3 && clear && sh $0
+  fi;;
+3)
+	  read -p "$(echo "delete a record:")" m
+if [ ! -f record ];then
+        echo "No record"
+        sleep 3 && exit
+   fi
+ 	  grep "$m" /root/record &> /dev/null
+case $? in
+  0)
+        sed -i "/$m/d" record
+        sleep 1 && echo "delete ok" && sh $0;;
+  *)
+        echo "no "$m" record"
+        sleep 1 && sh $0;;
+esac;;
+4)
+if [ ! -f record ];then
+        echo "No record"
+        sleep 3 && exit
+   fi
+        cat /root/record
+        sleep 3 && clear && sh $0;;
+5)
+if [ ! -f record ];then
+        echo "No record"
+        sleep 3 && exit
+   fi
+        vi /root/record
+        sh $0;;
+H)
+        clear
+        echo -e "\033[40;36mThis is a student's record manager program\033[0m"
+        sleep 3 && clear && sh $0;;
+Q)
+        exit;;
+*)
+        echo "please enter valid mode"
+        sleep 3 && clear && sh $0
+
+esac
+   
+
+
+
+
+
+
+
+

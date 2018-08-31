@@ -1,0 +1,89 @@
+题目 1:
+读取用户输入的任意 2 个数字,按大小排序后输出
+
+#!/bin/bash
+if [ $1 -ge $2 ];then
+ echo  $1 , $2 ';'  
+else
+ echo  $2 , $1 ';'
+fi
+
+
+
+题目 2:
+检查 eth0 网卡配置文件是否存在,且配置了 IP 地址,如果是,重启网络,否
+则提示错误
+
+#!/bin/bash
+if [ ! -z  $1 ];then
+ ifconfig $1 &> /opt/test.txt
+ grep eth0 /opt/test.txt  &> /dev/null     &&  grep inet /opt/test.txt   &> /dev/null
+ if [ $? -eq 0 ];then
+  systemctl restart eth0 &> /dev/null
+  rm -rf /opt/test.txt
+  echo "重启网络成功！"
+ else
+  rm -rf /opt/test.txt
+  echo "重启网络失败！"
+  exit 1
+ fi
+else
+ echo "重启网络失败！"
+ exit 2
+fi
+
+
+题目 3:
+监控系统登录人数,超过 4 人时,显示报警信息
+
+[root@server0 ~]#crontab -l
+* * * * * /root/test3.sh
+
+[root@server0 ~]#cat /root/test3.sh 
+#!/bin/bash
+a=$(who | wc -l)
+if [ $a -ge 4 ];then 
+ echo "登陆用户已超4个" | mail -s "用户登陆报警邮件" root
+fi
+
+
+题目 4:
+写一个脚本 arvg.sh,可以读取用户输入的参数变量,如#arvg.sh test12 ,然后
+问用户是否要创建目录,如果用户回答 yes 或者 YES,则为用户创建目录,然
+后问用户是否为其创建文件,如果回答 yes,则在刚才已经创建好的目录下创
+建 test01 文件
+
+#!/bin/bash
+read -p "请您输入目录名称："  dir
+read -p "是否要创建目录$dir：" A
+if [ "$A" == "yes" ];then
+ mkdir $dir
+ read -p "是否要在目录$dir下创建文件：" B
+ if [ "$B" == "yes" ];then
+ touch  $dir/test01
+ fi
+elif [ "$A" == "YES" ];then
+ mkdir $dir
+ read -p "是否要在目录$dir下创建文件：" B
+ if [ "$B" == "yes" ];then
+ touch  $dir/test01
+ fi
+fi
+
+
+题目 5:
+判断当前主机的 CPU 生产商,其信息在/proc/cpuinfo 文件中 vendor id 一
+行中。如果其生产商为 GenuineIntel,就显示其为 Intel 公司;否则,就显示
+其为 AMD 公司
+
+#!/bin/bash
+grep GenuineIntel /proc/cpuinfo &> /dev/null
+if [ $? -eq 0 ];then
+ echo "intel 公司"
+else
+ echo "AMD 公司"
+fi
+
+
+
+
