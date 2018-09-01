@@ -1,0 +1,230 @@
+运算：
+	整数 expr ; $[x+y] $((x+y)); let 变量=x+y
+	++,--,+=,-=,*=,/=,%=  x+=8  x=x+8 
+	小数 bc
+	echo "1.2+3.5"  | bc
+	echo "2/10" | bc
+	echo "scale=2;2/10" | bc
+测试
+	1.字符 ==(等于)  !=（不等于）   -z（空值）   !-z（非空值）  
+	2.数字 -eq   -ne  -gt  -ge  -lt  -le
+	3.文件或目录 -e（存在）   -f(文件)   -d（目录）   -r（可读）   -w（可写）  -x （可执行）
+
+
+输出显示带颜色的字体：
+echo -e "\033[32;43mOK\033[0m"
+0x样式
+3x字体色
+4x背景色
+
+
+ping同一网段快速显结果：
+#!/bin/bash
+myping(){
+  ping -c1 -0.1  -W 192.168.4.$1 &> /dev/null
+  if [ $? -eq 0 ];then
+	echo "192.168.4.$1 is up"
+  else
+	echo "192.168.4.$1 is down"
+  fi
+}
+for i in {1..254}
+do
+  myping $i &
+done
+wait 
+
+
+echo ${变量}
+echo ${变量::}		截取
+echo ${变量///}		替换  
+echo ${变量#*:}		掐头
+echo ${变量%:*}		去问去尾
+echo ${变量:-1234}	变量初始值
+
+
+数组 （一个可以存多个值的变量）
+x[0]=12
+x[1]=12
+x[2]=12
+x=(12 12 12)
+echo ${x[0]}
+
+
+expect << EOF
+spawn 命令ssh -o
+expect 看屏幕输出  {send "输入键盘指令\n"}
+expect 看屏幕输出  {send "输入键盘指令\n"}
+EOF
+
+
+基本正则列表：
+
+^		匹配行首
+$		匹配行尾
+[]		集合，匹配集合中的任意单个字符
+[^]		对集合取反
+.		匹配任意单个字符
+*		匹配前一个字符任意次数（*不允许单独使用）
+\{n,m\}		匹配前一个字符n到m次
+\{n\}		匹配前一个字符n次
+\{n,\}		匹配前一个字符n次以上
+\(\)		保留
+
+扩展正则列表：
++		最少匹配一次（1次或以上）
+？		最多匹配一次（0或1次）
+{n,m}		匹配n到m次
+()		组合为整数，保留
+	ab*  ab  abb  abbbb
+	(ab)*  ab  abab  abababab
+|		或者     
+	(test|taste)
+\b		单词边界
+
+优点：基本正则兼容性强（所有支持正则的软件都支持基本正则）
+缺点：写的麻烦
+
+优点：扩展正则兼（相对基本正则）容性差（不是每个软件都支持扩展正则）
+缺点：写的简单
+
+grep 支持基本正则，也支持扩展正则，但是用扩展正则时，需要用egrep或者grep -E	
+例如： grep -E "(test|taste)"  1.txt
+
+
+SED：修改文件
+sed   [选项]   '条件指令'    文件
+选项：
+-r 	让sed支持扩展正则
+-n	屏蔽默认输出
+-i	修改源文件
+条件：
+行号 4  4,5  4~2  4，+10
+/正则/	
+指令：
+p 打印
+d 删除
+s 替换s/旧/新/g
+a 追加
+i 插入	
+c 替换行
+
+
+AWK：过滤数据
+格式1.	awk  [选项]  '[条件]{指令}'  文件
+格式2.	awk  [选项]  ' BEGIN{指令} {指令} END{指令}'  文件
+/正则/		全行匹配（包含即可）
+$1~/正则/	第1列匹配（包含即可）/root/
+$1!~/root/	第1列不匹配（包含即可）/root/
+
+数字/字符精确匹配
+$3>=1000
+$3<1000
+$1=="root"
+
+&&（并且）  ||（或者）
+例如：
+awk -F: "$3>1000&&$3<1003"  /etc/passwd
+awk -F: "$3>1000||$3<10"  /etc/passwd
+
+例如：awk -F: -v  x=root '$1==x'
+-F：	指定“:”为分隔号
+-v	赋值一个用户定义变量
+
+
+awk  [选项]  '[条件]{指令}'  文件
+
+if (判断){
+命令
+}
+
+
+if (判断){
+命令
+}
+else{
+命令
+}
+
+例如： awk [选项] ‘{if($3<=1000){x++}}’ 文件
+
+awk -F: 'BEGIN{print "用户名  UID  家目录"}{print $1,$3,$6}END{print "总用量："NR}'  /etc/passwd  | column -t
+用户名     UID       家目录
+root       0         /root
+bin        1         /bin
+
+column -t (列表对齐)
+
+awk  -F分隔符  ' BEGIN{指令} {指令} END{指令}'  文件
+print "常量字符串"
+print $0 $1 $2 ...NR NF
+
+条件：
+1.正则：
+	/正则/  $1~/正则/  $2~/正则/  $1!~/正则/
+2.数字或字符比较
+	NR==3   $3>=1000   $3<1000   $4<10
+3.逻辑判断
+	&&并且   ||或者
+awk 'BEGIN{print x++}'
+awk 'BEGIN{print x--}'
+awk 'BEGIN{print x+=8}
+awk 'BEGIN{print x=x+8}
+
+if($3>=1000){x++}else{指令}
+awk 'BEGIN{a[0]=1;a[1]=2;a[2]=3;for(i in a){print i,a[i]}}'
+0 1
+1 2
+2 3
+
+
+虚拟100人访问 100000次网页：
+ab -c100  -n100000  http://192.168.4.254/
+ll -h /var/log/httpd/access_log		查看日志文件大小
+wc -l /var/log/httpd/access_log		查看日志被访问次数
+
+awk '{ip[$1]++}END{for(i in ip){print ip[i],i}}'   /var/log/httpd/access_log
+
+who | awk '{ip[$1]++}END{for(i in ip){print ip[i],i}}'  
+1 tom
+5 root
+
+统计每个XX的访问次数：
+awk '{ip[$1]++}END{for(i in ip){print ip[i],i}}'
+
+awk '{ip[$1]++}END{for(i in ip){print ip[i],i}}'   /var/log/httpd/access_log | sort -n		按大小进行排序
+10 172.25.0.10
+50 172.25.0.250
+100000 172.25.0.11
+awk '{ip[$1]++}END{for(i in ip){print ip[i],i}}'   /var/log/httpd/access_log | sort -rn		倒序（相反的顺序）输出排序结果
+100000 172.25.0.11
+50 172.25.0.250
+10 172.25.0.10
+awk '{ip[$1]++}END{for(i in ip){print ip[i],i}}'   /var/log/httpd/access_log | sort 		逐个数字对比排序
+100000 172.25.0.11
+10 172.25.0.10
+50 172.25.0.250
+
+
+
+
+ps aux | grep httpd | grep -v grep 
+netstat -nutlp |grep sshd
+netstat -nutlp |grepj -q httpd
+echo $?
+0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
